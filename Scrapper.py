@@ -4,18 +4,11 @@ from io import BytesIO
 from google.oauth2 import service_account
 from google.cloud import documentai_v1 as documentai
 
+# Configuration Google Document AI via secrets.toml
+credentials_info = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-# Configuration Google Document AI
-if "GOOGLE_APPLICATION_CREDENTIALS" in st.secrets:
-    # Récupérer les informations d'identification à partir des secrets sur Streamlit Cloud
-    credentials = service_account.Credentials.from_service_account_info(
-        st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
-    )
-else:
-    # Si vous êtes en développement local, utilisez un fichier JSON local
-    credentials = service_account.Credentials.from_service_account_file('path/to/key.json')
-
-project_id = "74081051811"
+project_id = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]["project_id"]
 location = "us"
 ocr_processor_id = "f0108ad9f637ec0c"
 form_parser_processor_id = "213655943885e363"
@@ -36,13 +29,13 @@ def process_document_form(file_bytes, mime_type):
     document = {"content": file_bytes, "mime_type": mime_type}
     request = {"name": name, "raw_document": document}
     result = client.process_document(request=request)
-    
+
     form_data = {}
     for entity in result.document.entities:
         field_name = entity.field_name.text if entity.field_name else "Inconnu"
         field_value = entity.field_value.text if entity.field_value else "Inconnu"
         form_data[field_name] = field_value
-    
+
     # Extraction des tables si présentes
     tables = []
     for page in result.document.pages:
@@ -53,7 +46,7 @@ def process_document_form(file_bytes, mime_type):
             for row in table.body_rows:
                 table_data.append([cell.layout.text for cell in row.cells])
             tables.append(pd.DataFrame(table_data))
-    
+
     return form_data, tables
 
 # Fonction pour gérer le fichier uploadé et décider entre OCR et Form Parsing
@@ -74,18 +67,18 @@ def to_excel(df, tables=None):
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, index=False, sheet_name='Extracted Text')
-    
+
     if tables:
         for i, table in enumerate(tables):
             table.to_excel(writer, sheet_name=f'Table_{i+1}', index=False)
-    
+
     writer.close()
     output.seek(0)
     return output
 
 # Configuration de l'interface Streamlit
 st.set_page_config(page_title="Document AI - OCR et Form Parsing", page_icon="📄", layout="wide")
-st.title("📄  ScrappIn")
+st.title("📄 OCR et Extraction de Formulaires avec Document AI")
 
 # Chargement de fichier
 file_type = st.sidebar.selectbox("Format de téléchargement", ["TXT", "Excel"])
