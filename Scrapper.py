@@ -11,13 +11,9 @@ def get_credentials_from_secrets():
     credentials = service_account.Credentials.from_service_account_info(service_account_info)
     return credentials
 
-# Configuration des paramètres Document AI
-def setup_documentai_client():
-    credentials = get_credentials_from_secrets()
-    client = documentai.DocumentProcessorServiceClient(credentials=credentials)
-    return client
-
-client = setup_documentai_client()
+# Création du client Document AI avec les identifiants
+credentials = get_credentials_from_secrets()
+client = documentai.DocumentProcessorServiceClient(credentials=credentials)
 
 # Paramètres Google Document AI
 project_id = "74081051811"
