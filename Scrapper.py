@@ -78,7 +78,7 @@ def to_excel(df, tables=None):
 
 # Configuration de l'interface Streamlit
 st.set_page_config(page_title="Document AI - OCR et Form Parsing", page_icon="📄", layout="wide")
-st.title("📄 OCR et Extraction de Formulaires avec Document AI")
+st.title("📄 ScrappIn")
 
 # Chargement de fichier
 file_type = st.sidebar.selectbox("Format de téléchargement", ["TXT", "Excel"])
