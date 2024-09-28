@@ -1,25 +1,26 @@
 import streamlit as st
 import pandas as pd
-import xlsxwriter
 from io import BytesIO
 from google.oauth2 import service_account
 from google.cloud import documentai_v1 as documentai
 
-# Récupérer les informations d'identification et de configuration depuis st.secrets
-def get_credentials_from_secrets():
-    service_account_info = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
-    credentials = service_account.Credentials.from_service_account_info(service_account_info)
-    return credentials
 
-# Création du client Document AI avec les identifiants
-credentials = get_credentials_from_secrets()
-client = documentai.DocumentProcessorServiceClient(credentials=credentials)
+# Configuration Google Document AI
+if "GOOGLE_APPLICATION_CREDENTIALS" in st.secrets:
+    # Récupérer les informations d'identification à partir des secrets sur Streamlit Cloud
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
+    )
+else:
+    # Si vous êtes en développement local, utilisez un fichier JSON local
+    credentials = service_account.Credentials.from_service_account_file('path/to/key.json')
 
-# Paramètres Google Document AI
 project_id = "74081051811"
 location = "us"
 ocr_processor_id = "f0108ad9f637ec0c"
 form_parser_processor_id = "213655943885e363"
+
+client = documentai.DocumentProcessorServiceClient(credentials=credentials)
 
 # Fonction pour traiter un document avec Google Document AI (OCR)
 def process_document_ocr(file_bytes, mime_type):
@@ -84,7 +85,7 @@ def to_excel(df, tables=None):
 
 # Configuration de l'interface Streamlit
 st.set_page_config(page_title="Document AI - OCR et Form Parsing", page_icon="📄", layout="wide")
-st.title("📄 ScrappIn")
+st.title("📄  ScrappIn")
 
 # Chargement de fichier
 file_type = st.sidebar.selectbox("Format de téléchargement", ["TXT", "Excel"])
