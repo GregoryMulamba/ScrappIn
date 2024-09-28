@@ -20,10 +20,10 @@ def setup_documentai_client():
 client = setup_documentai_client()
 
 # Paramètres Google Document AI
-project_id = st.secrets["project_id"]
-location = st.secrets["location"]
-ocr_processor_id = st.secrets["ocr_processor_id"]
-form_parser_processor_id = st.secrets["form_parser_processor_id"]
+project_id = "74081051811"
+location = "us"
+ocr_processor_id = "f0108ad9f637ec0c"
+form_parser_processor_id = "213655943885e363"
 
 # Fonction pour traiter un document avec Google Document AI (OCR)
 def process_document_ocr(file_bytes, mime_type):
