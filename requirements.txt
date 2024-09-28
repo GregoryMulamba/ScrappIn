@@ -1,0 +1,7 @@
+streamlit
+pandas
+google-auth
+google-auth-oauthlib
+google-cloud-documentai
+openpyxl
+xlsxwriter
